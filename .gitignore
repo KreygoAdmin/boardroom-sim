@@ -1,0 +1,26 @@
+# Secrets
+.env
+*.env
+
+# Node
+node_modules/
+dist/
+.cache/
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+
+# Build / IDE
+.vscode/
+.claude/
+*.log
+
+# Project-specific
+test-topic.bat
+memory/

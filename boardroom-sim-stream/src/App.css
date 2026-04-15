@@ -1,0 +1,131 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+/* Mobile safe area — prevents content from being obscured by browser chrome */
+.safe-area-bottom {
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+}
+
+/* ============================================================
+   LIGHT MODE OVERRIDES
+   Applied when data-theme="light" is set on the root wrapper
+   ============================================================ */
+
+[data-theme="light"] {
+  /* Page backgrounds */
+  --lm-bg-darkest:  #f1f5f9;   /* replaces gray-950 */
+  --lm-bg-dark:     #ffffff;   /* replaces gray-900 */
+  --lm-bg-medium:   #e2e8f0;   /* replaces gray-800 */
+  --lm-bg-input:    #f8fafc;   /* replaces zinc-800 */
+
+  /* Text */
+  --lm-text-primary:   #1e293b; /* replaces gray-200 */
+  --lm-text-secondary: #334155; /* replaces gray-300 */
+  --lm-text-muted:     #64748b; /* replaces gray-400 / zinc-500 */
+  --lm-text-subtle:    #94a3b8; /* replaces gray-500 */
+
+  /* Borders */
+  --lm-border-strong: #cbd5e1;  /* replaces gray-800 / zinc-700 */
+  --lm-border-soft:   #e2e8f0;  /* replaces gray-700 */
+}
+
+/* --- Backgrounds --- */
+[data-theme="light"] .bg-gray-950   { background-color: var(--lm-bg-darkest) !important; }
+[data-theme="light"] .bg-gray-900   { background-color: var(--lm-bg-dark)    !important; }
+[data-theme="light"] .bg-gray-800   { background-color: var(--lm-bg-medium)  !important; }
+[data-theme="light"] .bg-zinc-800   { background-color: var(--lm-bg-input)   !important; }
+
+/* Semi-transparent variants */
+[data-theme="light"] .bg-gray-900\/80 { background-color: rgba(255,255,255,0.9)   !important; }
+[data-theme="light"] .bg-gray-900\/50 { background-color: rgba(255,255,255,0.6)   !important; }
+[data-theme="light"] .bg-gray-800\/50 { background-color: rgba(226,232,240,0.5)   !important; }
+[data-theme="light"] .bg-zinc-800\/50 { background-color: rgba(248,250,252,0.6)   !important; }
+
+/* Hover states */
+[data-theme="light"] .hover\:bg-gray-800:hover { background-color: var(--lm-bg-medium) !important; }
+[data-theme="light"] .hover\:bg-zinc-700:hover  { background-color: var(--lm-bg-medium) !important; }
+
+/* --- Text --- */
+[data-theme="light"] .text-gray-200 { color: var(--lm-text-primary)   !important; }
+[data-theme="light"] .text-gray-300 { color: var(--lm-text-secondary) !important; }
+[data-theme="light"] .text-gray-400 { color: var(--lm-text-muted)     !important; }
+[data-theme="light"] .text-gray-500 { color: var(--lm-text-subtle)    !important; }
+[data-theme="light"] .text-zinc-500 { color: var(--lm-text-muted)     !important; }
+
+/* Main body text (set on root wrapper) */
+[data-theme="light"].text-gray-200,
+[data-theme="light"] > .text-gray-200 { color: var(--lm-text-primary) !important; }
+
+/* --- Borders --- */
+[data-theme="light"] .border-gray-800 { border-color: var(--lm-border-strong) !important; }
+[data-theme="light"] .border-gray-700 { border-color: var(--lm-border-soft)   !important; }
+[data-theme="light"] .border-zinc-700 { border-color: var(--lm-border-strong) !important; }
+
+/* --- Scrollbar --- */
+[data-theme="light"] .scrollbar-thumb-gray-800 {
+  scrollbar-color: var(--lm-border-strong) transparent;
+}
+
+/* --- Misc structural fixes --- */
+/* The mobile overlay backdrop keeps full opacity in either theme */
+[data-theme="light"] .bg-gray-950 input,
+[data-theme="light"] .bg-gray-950 textarea {
+  color: var(--lm-text-primary);
+}
+
+/* Next Speaker button — readable text in light mode */
+[data-theme="light"] #tutorial-next-speaker {
+  color: #000000 !important;
+}
+
+/* Message input — darker border + white bg so it stands out from the panel */
+[data-theme="light"] #tutorial-message-input {
+  border-color: #475569 !important;   /* slate-600: clearly visible on any light surface */
+  background-color: #ffffff !important;
+  color: #1f2328 !important;
+}
+
+/* Send button — keep the icon white on the indigo background in light mode */
+[data-theme="light"] #tutorial-send-button {
+  color: #ffffff !important;
+}
