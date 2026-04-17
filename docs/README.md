@@ -2,7 +2,7 @@
 
 A multi-agent AI orchestration app that simulates realistic board meeting conversations. Create a custom boardroom with AI-driven executives, give them a topic, and watch them debate, vote, and produce meeting minutes — all in real time.
 
-Live at: **https://boardroom.kreygo.com** | Stream build: **https://sim.kreygo.com**
+Live at: **https://boardroom.kreygo.com** 
 
 ---
 
