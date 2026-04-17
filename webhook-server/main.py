@@ -552,26 +552,22 @@ async def broadcast_queue():
 
 # ── Filler Session (runs when queue is empty) ────────────────────────────────
 async def scan_news_for_topic() -> dict:
-    """Search today's top news and pick the most debate-worthy story for the boardroom."""
-    prompt = """You are scanning today's top news to find the most compelling boardroom debate topic.
+    """Search today's top news and return 3 debate-worthy stories, ordered best-first."""
+    prompt = """You are scanning today's top news to find compelling boardroom debate topics.
 
-Search for the 5 most significant business, technology, or geopolitical news stories from the last 48 hours that would make excellent boardroom debates — meaning: real companies or governments involved, high stakes, and genuine disagreement possible among reasonable people.
+Search for the 3 most significant business, technology, or geopolitical news stories from the last 48 hours that would make excellent boardroom debates — meaning: real companies or governments involved, high stakes, and genuine disagreement possible among reasonable people.
+
+Order them best-first: the most debate-worthy story goes at index 0. All three must be distinct stories about different events — do not repeat variations of the same story.
 
 Return ONLY valid JSON — no markdown fences, no explanation, no text before or after:
 {
   "stories": [
-    {"headline": "Short headline (under 12 words)", "summary": "One sentence: what happened, who is involved, why it matters."},
-    {"headline": "...", "summary": "..."},
-    {"headline": "...", "summary": "..."},
-    {"headline": "...", "summary": "..."},
-    {"headline": "...", "summary": "..."}
+    {"headline": "Short headline (under 12 words)", "summary": "One sentence: what happened, who is involved, why it matters.", "debate_topic": "The debate topic derived from this story — a short phrase under 15 words"},
+    {"headline": "...", "summary": "...", "debate_topic": "..."},
+    {"headline": "...", "summary": "...", "debate_topic": "..."}
   ],
-  "selected_index": 0,
-  "selected_topic": "The debate topic derived from the selected story — a short phrase under 15 words",
-  "selected_reason": "One sentence explaining why this story makes the best boardroom debate right now"
-}
-
-selected_index must be the 0-based index (0–4) of the story you selected as most debate-worthy."""
+  "selected_reason": "One sentence explaining why the first story (index 0) makes the best boardroom debate right now"
+}"""
 
     try:
         result = await call_gemini_with_search(prompt, max_tokens=900, temperature=0.3)
@@ -579,9 +575,11 @@ selected_index must be the 0-based index (0–4) of the story you selected as mo
         start = cleaned.find("{")
         end = cleaned.rfind("}") + 1
         data = json.loads(cleaned[start:end])
-        # Validate required fields
-        if "stories" not in data or "selected_topic" not in data:
+        stories = data.get("stories") or []
+        if not stories or not all(s.get("debate_topic") for s in stories):
             raise ValueError("Missing required fields")
+        data["selected_index"] = 0
+        data["selected_topic"] = stories[0]["debate_topic"]
         return data
     except Exception as e:
         print(f"[Controller] News scan failed ({e}) — falling back to generated topic")
@@ -614,13 +612,40 @@ async def run_filler_session():
         await manager.broadcast_status("Scanning today's headlines…")
         scan = await scan_news_for_topic()
         topic = scan["selected_topic"]
+        selected_index = scan.get("selected_index", 0)
         print(f"[Controller] Filler topic from news scan: {topic}")
+
+        # Queue the runner-up stories so the next filler cycles don't re-scan
+        # and end up picking the same headline over and over.
+        extra_stories = [
+            s for i, s in enumerate(scan.get("stories", []))
+            if i != selected_index and s.get("debate_topic")
+        ]
+        if extra_stories:
+            try:
+                now_iso = datetime.now(timezone.utc).isoformat()
+                for s in extra_stories:
+                    supabase_insert("topic_requests", {
+                        "id": str(uuid_lib.uuid4()),
+                        "viewer_name": "Headlines",
+                        "message": s["debate_topic"],
+                        "base_amount": 0,
+                        "tip_amount": 0,
+                        "priority_score": -1.0,
+                        "stripe_session_id": None,
+                        "status": "pending",
+                        "created_at": now_iso,
+                    })
+                print(f"[Controller] Queued {len(extra_stories)} runner-up news topics")
+                await broadcast_queue()
+            except Exception as e:
+                print(f"[Controller] Failed to queue extra news topics: {e}")
 
         # Show the found stories to the audience (old session still visible behind)
         if scan.get("stories"):
             await manager.send("NEWS_SCAN", {
                 "stories": scan["stories"],
-                "selected_index": scan.get("selected_index", 0),
+                "selected_index": selected_index,
                 "selected_reason": scan.get("selected_reason", ""),
                 "selected_topic": topic,
             })
